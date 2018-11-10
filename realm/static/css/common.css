@@ -1,0 +1,39 @@
+html,#app,body{
+    font-family:regular,Arial,'微软雅黑','Microsoft JhengHei',sans-serif;
+    width: 100%;
+    height: 100%;
+}
+
+html{
+    font-size: 100px;
+}
+
+body{
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -o-user-select:none;
+    user-select:none;
+    margin: 0;
+    background-color: #f4f3f1;
+}
+ul{
+    padding: 0;
+    margin: 0;
+}
+a{
+  text-decoration: none;
+}
+li{
+    list-style: none;
+}
+
+.layui-m-layer .layui-m-layer-msg{
+  bottom: 50px !important;
+}
+
+.clear:after,.clear:before{display:table;content:"";}
+.clear:after {clear:both;}
+
+.hide{
+  display: none;
+}
