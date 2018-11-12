@@ -5,7 +5,7 @@
             <div class="voteList-create">
                 <span class="voteList-voteEmpty">还没有任何投票</span>
                 <div class="voteList-createVote">
-                    <span class="voteList-createVoteBtn">创建新投票</span>
+                    <router-link class="voteList-createVoteBtn" to="/work/createVote"><i class="voteList-createVoteBtnIcon"></i>创建新投票</router-link>
                 </div>
             </div>
             <div class="voteList-box"></div>
@@ -37,6 +37,7 @@
     .voteList-main
         width 100%
         height 100%
+        background url("../../../assets/images/topBg.png") no-repeat top left  #DAE2ED
 
     .voteList-content
         width 100%
@@ -77,6 +78,14 @@
         line-height .38rem
         background linear-gradient(126deg,rgba(102,92,249,1),rgba(93,127,251,1));
         box-shadow:0 3px 8px 0 rgba(102,92,249,0.68);
+
+    .voteList-createVoteBtnIcon
+        background url("../../../assets/images/addVote.png") no-repeat center
+        width .14rem
+        height .14rem
+        margin-right .05rem
+        background-size contain
+        display inline-block
 
 </style>
 

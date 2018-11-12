@@ -4,17 +4,18 @@ import router from './router/index'
 import store from './store/index'
 import axios from 'axios'
 import Vuex from 'vuex'
-// import Router from "vue-router/types/index";
-import VConsole from 'vconsole'
+import MintUI from 'mint-ui'
+import 'mint-ui/lib/style.css'
+// import VConsole from 'vconsole'
 // let vConsole = new VConsole();//初始化
 //
 // Vue.use(vConsole);//设为全局
 
 Vue.use( Vuex );
-
+Vue.use(MintUI)
 Vue.config.productionTip = false;
 
-let url = 'http://192.168.31.124:8084/';
+let url = 'http://192.168.31.124:8080/';
 // if (window.location.href.indexOf('test') > -1) {
 //     url = 'http://api.bcrealm.com/api/'
 // } else if (window.location.href.indexOf('localhost') > -1) {

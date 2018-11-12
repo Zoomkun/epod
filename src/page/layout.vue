@@ -83,10 +83,8 @@
 
     .main
         box-sizing border-box
-        padding 0 .15rem
         flex 1
         overflow auto
-        background url("../assets/images/topBg.png") no-repeat top left  #DAE2ED
 
     .table
         height .4rem

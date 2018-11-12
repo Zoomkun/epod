@@ -5,7 +5,7 @@ import Layout from '@/page/layout.vue'
 
 // 投票
 import VoteList from '@/page/work/vote/voteList.vue'
-import Vote from '@/page/work/vote/creatVote.vue'
+import CreateVote from '@/page/work/vote/creatVote.vue'
 
 // 行情
 import MyMarket from '@/page/work/market/myMarket.vue'
@@ -35,7 +35,8 @@ export default new Router({
                 {
                     name: 'projectList',
                     component: ProjectList,
-                    path: 'projectList'
+                    path: 'projectList',
+                    tableShow:true
                 },
             ]
         },
@@ -46,7 +47,8 @@ export default new Router({
                 {
                     name: 'workIndex',
                     component: WorkIndex,
-                    path: 'workIndex'
+                    path: 'workIndex',
+                    tableShow:true
                 },
                 {
                     name: 'myMarket',
@@ -54,9 +56,14 @@ export default new Router({
                     path: 'myMarket'
                 },
                 {
-                    name: 'vote',
-                    component: Vote,
-                    path: 'vote'
+                    name: 'createVote',
+                    component: CreateVote,
+                    path: 'createVote'
+                },
+                {
+                    name: 'voteList',
+                    component: VoteList,
+                    path: 'voteList'
                 },
                 {
                     name: 'voteList',
@@ -72,7 +79,8 @@ export default new Router({
                 {
                     name: 'personal',
                     component: Personal,
-                    path: 'personal'
+                    path: 'personal',
+                    tableShow:true
                 },
                 {
                     name: 'basic',

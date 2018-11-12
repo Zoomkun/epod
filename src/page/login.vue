@@ -66,7 +66,7 @@
                 self.$ajax.post('user/user/smsLogin', self.formData)
                     .then(function (data) {
                         if (data.code === 1) {
-                            self.$router.push('vote/vote')
+                            self.$router.push('project/projectList')
                             self.$ajax.defaults.headers.common['token'] = data.data.token;
                             localStorage.setItem('user', JSON.stringify(data.data))
                         }

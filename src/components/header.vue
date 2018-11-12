@@ -19,9 +19,9 @@
 <style lang="stylus">
     .publicHeaderBox
         height .3rem
+        box-sizing border-box
         float left
-        width 100%
-        margin .15rem 0 .2rem
+        margin .15rem 0 .2rem .15rem
 
     .backBtn
         float left
