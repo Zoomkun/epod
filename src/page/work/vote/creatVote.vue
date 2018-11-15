@@ -71,12 +71,17 @@
     export default {
         name: 'createVote',
         mounted() {
-
+            let draftId = this.$route.query.params
+            if(draftId){
+                this.draftId = draftId
+                this.vote = JSON.parse(localStorage.getItem('voteList'))[draftId]
+            }
         },
         data() {
             return {
                 selected: '1',
                 header: "创建投票",
+                draftId:null,
                 vote: {
                     endTime: "",
                     endTimeType: '1',
@@ -125,6 +130,10 @@
                 // TODO：优化
                 if(localStorage.getItem('voteList')){
                     let voteList = JSON.parse(localStorage.getItem('voteList'))
+                    if(voteList.length>19){
+                        Toast('草稿箱最多保存20条');
+                        return false
+                    }
                     voteList.push(self.vote)
                    localStorage.setItem('voteList', JSON.stringify(voteList))
                 }else{
@@ -134,7 +143,6 @@
             // 投票发布
             releaseVote(){
                 let self = this
-                console.log(!self.validForm())
                 if(self.validForm()){
                     return false
                 }
@@ -143,7 +151,12 @@
                     .then(function (data) {
                         if (data.code === 1) {
                             self.$router.push('/work/voteList')
+                            if(self.draftId){
+                                let draftData = JSON.parse(localStorage.getItem('voteList'))
+                                draftData.splice(self.draftId,1)
+                                localStorage.setItem('voteList',JSON.stringify(draftData))
 
+                            }
                         }
                     })
             },

@@ -19,8 +19,8 @@
                     </router-link>
                 </div>
             </div>
-            <div class="voteList-contentMask" v-if="voteList.draftBtn"
-                 @click="()=>{this.voteList.draftBtnIndex=false}"></div>
+            <div class="voteList-contentMask" v-if="voteList.draftBtnIndex!==null"
+                 @click="()=>{this.voteList.draftBtnIndex=null}"></div>
 
             <div class="voteList-list" v-if="showVoteList === true">
 
@@ -73,12 +73,12 @@
                         <div class="voteList-scrollCenter">
                             <p class="voteList-scrollTitle voteList-scrollTitleDraft">{{item.voteTitle}}</p>
                         </div>
-                        <div class="voteList-draftBtnBox" @click="showDraftBtn(index)"
-                             :class="voteList.draftBtnIndex === index ? 'active' : 'out'">
+                        <div class="voteList-draftBtnBox" @click="showDraftBtn(index,$event)"
+                             :class="voteList.draftBtnIndex === index  ? 'active' : 'out'">
                             <div class="voteList-draftBtnMain">
                                 <div class="voteList-draftBtn">
-                                    <router-link class="voteList-draftDel" to="/work/voteList">删除</router-link>
-                                    <router-link class="voteList-draftEdit" to="/work/voteList">编辑</router-link>
+                                    <span class="voteList-draftDel" @click="delDraft(index)">删除</span>
+                                    <span class="voteList-draftEdit" @click="editDraft(index)">编辑</span>
                                 </div>
                             </div>
                         </div>
@@ -108,8 +108,8 @@
         data() {
             return {
                 header: '我的投票',
-                showVoteList: false, // 是否展示列表
-                showAddVote: false, // 是否展示列表
+                showVoteList: true, // 是否展示列表
+                showAddVote: false, // 是否添加
                 voteList: {//列表数据
                     selected: 0,// 当前投票列表选中的模块 1：进行中2：已结束3：草稿箱
                     draftBtn: false,// 显示遮罩层
@@ -162,10 +162,27 @@
                 console.log(this.voteList.loading)
             },
             // 点击空白处隐藏草稿箱模块按钮
-            showDraftBtn(index) {
+            showDraftBtn(index,e) {
                 let self = this
-                self.voteList.draftBtnIndex = index
-            }
+                if(e.target.className.indexOf('voteList-draftDel')>-1){
+                    self.voteList.draftBtnIndex = null
+                }else{
+                    self.voteList.draftBtnIndex = index
+                }
+
+            },
+            // 删除草稿
+            delDraft(index){
+                let self = this
+                self.voteList.draftData.splice(index, 1)
+                localStorage.setItem('voteList', JSON.stringify(self.voteList.draftData))
+                self.voteList.totalElements = self.voteList.draftData.length
+            },
+
+            // 编辑草稿
+            editDraft(index){
+                this.$router.push({path:'/work/createVote',query:{params:index}})
+            },
         },
         components: {
             PublicHeader
@@ -351,6 +368,7 @@
 
     .voteList-draftBtnBox
         position relative
+        z-index 2
         width .23rem
         height .37rem
 
