@@ -2,80 +2,89 @@
     <div class="voteList-main">
         <div class="voteList-top clear">
             <PublicHeader :header-title="header"></PublicHeader>
-            <div class="voteList-navBar">
-                <span class="voteList-barOnGoing active"><em>进行中</em></span>
-                <span class="voteList-barCompleted"><em>已结束</em></span>
-                <span class="voteList-barDraft"><em>草稿箱</em></span>
+            <div class="voteList-navBar" v-if="showVoteList=== true">
+                <span class="voteList-barOnGoing" :class="voteList.selected === 0 ? 'active': ''"
+                      @click="modelChange(0)"><em>进行中</em></span>
+                <span class="voteList-barCompleted" :class="voteList.selected === 1 ? 'active': ''"
+                      @click="modelChange(1)"><em>已结束</em></span>
+                <span class="voteList-barDraft" :class="voteList.selected === 2 ? 'active': ''" @click="modelChange(2)"><em>草稿箱</em></span>
             </div>
         </div>
         <div class="voteList-content">
-            <!--<div class="voteList-create">-->
-            <!--<span class="voteList-voteEmpty">还没有任何投票</span>-->
-            <!--<div class="voteList-createVote">-->
-            <!--<router-link class="voteList-createVoteBtn" to="/work/createVote"><i class="voteList-createVoteBtnIcon"></i>创建新投票</router-link>-->
-            <!--</div>-->
-            <!--</div>-->
-            <div class="voteList-contentMask" v-if="draftBtn" @click="()=>{this.draftBtn=false}"></div>
+            <div class="voteList-create" v-if="showAddVote === true">
+                <span class="voteList-voteEmpty">还没有任何投票</span>
+                <div class="voteList-createVote">
+                    <router-link class="voteList-createVoteBtn" to="/work/createVote"><i
+                        class="voteList-createVoteBtnIcon"></i>创建新投票
+                    </router-link>
+                </div>
+            </div>
+            <div class="voteList-contentMask" v-if="voteList.draftBtn"
+                 @click="()=>{this.voteList.draftBtnIndex=false}"></div>
 
-            <div class="voteList-list">
+            <div class="voteList-list" v-if="showVoteList === true">
 
                 <p class="voteList-listTitle">
-                    草稿箱（6）<span class="voteList-listDraftEmpty">一键清空</span>
+                    {{voteList.listTitle[voteList.selected]}}（{{voteList.totalElements}}）<span
+                    class="voteList-listDraftEmpty" v-if="voteList.selected === 3">一键清空</span>
                 </p>
-                <!--<ul-->
-                <!--class="voteList-scrollBox"-->
-                <!--v-infinite-scroll="loadMore"-->
-                <!--infinite-scroll-disabled="loading"-->
-                <!--infinite-scroll-distance="10">-->
-                <!--<li v-for="item in list" class="voteList-scrollLi">-->
-                <!--<div class="voteList-scrollIcon"></div>-->
-                <!--<div class="voteList-scrollCenter">-->
-                <!--<p class="voteList-scrollTitle">周末聚餐地址</p>-->
-                <!--<p class="voteList-scrollInfo">发起人: 我 参与人数：0</p>-->
-                <!--<p class="voteList-scrollDone">已投票</p>-->
-                <!--</div>-->
-                <!--<div class="voteList-scrollLink">去投票{{ item }}</div>-->
-                <!--</li>-->
-                <!--</ul>-->
-                <!--<ul-->
-                <!--class="voteList-scrollBox"-->
-                <!--v-infinite-scroll="loadMore"-->
-                <!--infinite-scroll-disabled="loading"-->
-                <!--infinite-scroll-distance="10">-->
-                <!--<li v-for="item in list" class="voteList-scrollLi">-->
-                <!--<div class="voteList-scrollIconOut"></div>-->
-                <!--<div class="voteList-scrollCenter">-->
-                <!--<p class="voteList-scrollTitle">周末聚餐地址</p>-->
-                <!--<p class="voteList-scrollInfo">发起人: 我 参与人数：0</p>-->
-                <!--<p class="voteList-scrollDo voteList-scrollDoBg">未投票</p>-->
-                <!--<p class="voteList-scrollDo">已投票</p>-->
-                <!--</div>-->
-                <!--<div class="voteList-scrollLink">查看结果{{ item }}</div>-->
-                <!--</li>-->
-                <!--</ul>-->
+                <ul
+                    v-if="voteList.selected === 0"
+                    class="voteList-scrollBox"
+                    v-infinite-scroll="loadMore"
+                    infinite-scroll-disabled="loading"
+                    infinite-scroll-distance="10">
+                    <li v-for="item in voteList.onGoingData.content" class="voteList-scrollLi">
+                        <div class="voteList-scrollIcon"></div>
+                        <div class="voteList-scrollCenter">
+                            <p class="voteList-scrollTitle">{{item.voteTitle}}</p>
+                            <p class="voteList-scrollInfo">发起人: {{item.createBy}} 参与人数：{{item.participants}}</p>
+                            <p class="voteList-scrollDone" v-if="~~item.isVote === 0">已投票</p>
+                        </div>
+                        <div class="voteList-scrollLink">{{item.isVote ? '查看结果' : '去投票'}}</div>
+                    </li>
+                </ul>
+                <ul
+                    v-if="voteList.selected === 1"
+                    class="voteList-scrollBox"
+                    v-infinite-scroll="loadMore"
+                    infinite-scroll-disabled="loading"
+                    infinite-scroll-distance="10">
+                    <li v-for="item  in voteList.onGoingData.content" class="voteList-scrollLi">
+                        <div class="voteList-scrollIconOut"></div>
+                        <div class="voteList-scrollCenter">
+                            <p class="voteList-scrollTitle">{{item.voteTitle}}</p>
+                            <p class="voteList-scrollInfo">发起人: {{item.createBy}} 参与人数：{{item.participants}}</p>
+                            <p class="voteList-scrollDo voteList-scrollDoBg" v-if="item.isVote === false">未投票</p>
+                            <p class="voteList-scrollDo" v-if="item.isVote === true">已投票</p>
+                        </div>
+                        <div class="voteList-scrollLink">查看结果</div>
+                    </li>
+                </ul>
 
                 <ul
+                    v-if="voteList.selected === 2"
                     class="voteList-scrollBox"
                     v-infinite-scroll="loadMore"
                     infinite-scroll-disabled="loading"
                     infinite-scroll-distance="100">
-                    <li v-for="item in list" class="voteList-scrollLi">
+                    <li v-for="(item,index) in voteList.draftData" class="voteList-scrollLi">
                         <div class="voteList-scrollIcon voteList-scrollIconDraft"></div>
                         <div class="voteList-scrollCenter">
-                            <p class="voteList-scrollTitle voteList-scrollTitleDraft">周末聚餐地址</p>
+                            <p class="voteList-scrollTitle voteList-scrollTitleDraft">{{item.voteTitle}}</p>
                         </div>
-                        <div class="voteList-draftBtnBox" @click="showDraftBtn" :class="draftBtn === true ? 'active' : 'out'">
+                        <div class="voteList-draftBtnBox" @click="showDraftBtn(index)"
+                             :class="voteList.draftBtnIndex === index ? 'active' : 'out'">
                             <div class="voteList-draftBtnMain">
                                 <div class="voteList-draftBtn">
                                     <router-link class="voteList-draftDel" to="/work/voteList">删除</router-link>
                                     <router-link class="voteList-draftEdit" to="/work/voteList">编辑</router-link>
                                 </div>
                             </div>
-
                         </div>
                     </li>
                 </ul>
-                <div class="voteList-loadMore" v-if="loading">
+                <div class="voteList-loadMore" v-if="voteList.loading">
                     <mt-spinner :type="3"></mt-spinner>
                     <span>加载更多</span>
                 </div>
@@ -90,34 +99,72 @@
 
     export default {
         name: 'createVote',
-        mounted() {
+        beforeMount() {
 
+        },
+        mounted() {
+            this.getData(1)
         },
         data() {
             return {
                 header: '我的投票',
-                selected: 1,
-                draftBtn:false,
-                loading: false,
-                list: [1, 2, 3, 4, 5, 6, 7, 8, 9,]
+                showVoteList: false, // 是否展示列表
+                showAddVote: false, // 是否展示列表
+                voteList: {//列表数据
+                    selected: 0,// 当前投票列表选中的模块 1：进行中2：已结束3：草稿箱
+                    draftBtn: false,// 显示遮罩层
+                    loading: false,// 显示loading动画
+                    onGoingData: {}, // 进行中数据
+                    listTitle: ['投票列表', '投票列表', '草稿箱'],
+                    totalElements: '',
+                    draftData:[],
+                    draftBtnIndex:null
+                }
             }
         },
         methods: {
-            loadMore() {
-                this.loading = true;
-                console.log(this.loading)
-
-                this.loading = false;
-                console.log(this.loading)
-            },
-            showDraftBtn(e){
+            getData(key) {
                 let self = this
-                if (e.target.parentElement.className.indexOf('voteList-draftBtn') > -1 || e.target.parentElement.parentElement.className.indexOf('voteList-draftBtnBox') >-1 || e.target.className.indexOf('voteList-draftDel') > -1 || e.target.className.indexOf('voteList-draftEdit') > -1 || e.target.className.indexOf('voteList-draftBtnBox') > -1) {
-                    self.draftBtn = !self.draftBtn
-                }else{
-                    self.draftBtn = false
+                // 投票列表数据初始化
+                self.$ajax.post('vote/page?page=1&size=2', {'state': key})
+                    .then(function (data) {
+                        if (data.code === 1 && data.data.totalElements > 0) {
+                            self.showVoteList = true
+                            self.voteList.onGoingData = data.data
+                            self.voteList.totalElements = data.data.totalElements
+                        } else {
+                            self.showAddVote = true
+                        }
+                    })
+            },
+            // 当前投票列表模块切换
+            modelChange(key) {
+                let self = this
+                self.voteList.selected = key
+                if (key !== 2) {
+                     key++
+                    self.getData(key)
+                } else {
+                    let data = localStorage.getItem('voteList')
+                    if(!data){
+                        return false
+                    }
+                    self.voteList.draftData = JSON.parse(localStorage.getItem('voteList'))
+                    self.voteList.totalElements = self.voteList.draftData.length
                 }
-                console.log(e.target.className)
+            },
+            // 上拉加载
+            loadMore() {
+                this.voteList.loading = true;
+                console.log(this.voteList.loading)
+
+                this.voteList.loading = false;
+                console.log(this.voteList.loading)
+            },
+            // 点击空白处隐藏草稿箱模块按钮
+            showDraftBtn(index) {
+                let self = this
+                self.voteList.draftBtnIndex = index
             }
         },
         components: {
@@ -306,7 +353,6 @@
         position relative
         width .23rem
         height .37rem
-
 
         &.active
             background url("../../../assets/images/draftBtnIng.png") no-repeat center

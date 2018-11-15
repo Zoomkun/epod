@@ -20,7 +20,7 @@
 <script>
     export default {
         name: 'createVote',
-        mounted() {
+        created() {
             let data = localStorage.getItem('user')
 
             if(!data){

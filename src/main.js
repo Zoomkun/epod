@@ -15,7 +15,7 @@ Vue.use( Vuex );
 Vue.use(MintUI)
 Vue.config.productionTip = false;
 
-let url = 'http://192.168.31.124:8017/';
+let url = 'http://192.168.31.124:8013/';
 // if (window.location.href.indexOf('test') > -1) {
 //     url = 'http://api.bcrealm.com/api/'
 // } else if (window.location.href.indexOf('localhost') > -1) {
