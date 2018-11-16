@@ -15,14 +15,7 @@ Vue.use( Vuex );
 Vue.use(MintUI)
 Vue.config.productionTip = false;
 
-let url = 'http://47.105.122.172:8014/';
-// if (window.location.href.indexOf('test') > -1) {
-//     url = 'http://api.bcrealm.com/api/'
-// } else if (window.location.href.indexOf('localhost') > -1) {
-//     url = 'http://192.168.31.124:8067/'
-// } else {
-// url = 'http://test.bcrealm.com/api/'
-// }
+let url = 'http://test.bcrealm.com/api/evote/';
 
 var $ajax = axios.create({
     baseURL: url,

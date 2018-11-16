@@ -7,6 +7,7 @@ import Layout from '@/page/layout.vue'
 import VoteList from '@/page/work/vote/voteList.vue'
 import CreateVote from '@/page/work/vote/creatVote.vue'
 import Vote from '@/page/work/vote/vote.vue'
+import VoteResults from '@/page/work/vote/voteResults.vue'
 
 // 行情
 import MyMarket from '@/page/work/market/myMarket.vue'
@@ -70,6 +71,11 @@ export default new Router({
                     name: 'vote',
                     component: Vote,
                     path: 'vote'
+                },
+                {
+                    name: 'voteResults',
+                    component: VoteResults,
+                    path: 'voteResults'
                 }
             ]
         },

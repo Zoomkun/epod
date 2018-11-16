@@ -3,28 +3,28 @@
         <div class="vote-bg"></div>
         <PublicHeader :header-title="header" style="z-index: 2;position: relative"></PublicHeader>
         <div class="vote-content" style="z-index: 1;position: relative">
-            <div class="vote-tips" v-if="vote.preview"><span class="vote-tipsIcon"></span>预览模式下不能投票</div>
+            <div class="vote-tips" v-if="isPreview"><span class="vote-tipsIcon"></span>预览模式下不能投票</div>
             <div class="vote-title">[标题] {{vote.voteTitle}}</div>
             <div class="vote-desc" v-if="vote.voteDesc">{{vote.voteDesc}}</div>
             <div class="vote-endTime">截止日期: {{vote.endTime}}</div>
             <div class="vote-box">
                 <div class="vote-type">投票选项（多选）</div>
                 <mt-radio
-                    v-if="~~vote.optionType === 1"
+                    v-if="~~vote.optionType === 2"
                     class="vote-radioList"
                     v-model="select.radio"
                     :options="vote.optionDTOList | options">
                 </mt-radio>
                 <mt-checklist
-                    v-if="~~vote.optionType === 2"
+                    v-if="~~vote.optionType === 1"
                     class="vote-checkBoxList"
                     v-model="select.check"
                     :options="vote.optionDTOList | options">
                 </mt-checklist>
-                <div class="vote-submit" @click="!vote.preview && submit()">投票</div>
+                <div class="vote-submit" @click="!isPreview && submit()">投票</div>
             </div>
         </div>
-        <div v-if="vote.preview" class="vote-releaseBtn">发布</div>
+        <div v-if="isPreview" class="vote-releaseBtn">发布</div>
     </div>
 </template>
 
@@ -34,16 +34,24 @@
     export default {
         name: 'vote',
         mounted() {
-            this.vote = JSON.parse(this.$route.query.params)
-            console.log(this.vote)
+            let data  = this.$route.query.params
+            if(data){
+                this.isPreview = true
+                this.vote = JSON.parse(data)
+            }else{
+                this.voteId = this.$route.query.voteId
+                this.getVoteData()
+            }
         },
         data() {
             return {
                 header: '预览投票',
+                isPreview:false,
                 select:{
                     check:[],
                     radio:''
                 },
+                voteId:null,
                 vote:{}
             }
         },
@@ -52,7 +60,7 @@
                 // let data = this.vote.optionDTOList
                 for (let i in data){
                     data[i].label = data[i].content
-                    data[i].value = new String(data[i].id)
+                    data[i].value = new String(data[i].optionId)
                 }
                 console.log(data)
                 return data
@@ -73,6 +81,15 @@
                         if (data.code === 1) {
                             self.$router.push('/work/voteList')
 
+                        }
+                    })
+            },
+            getVoteData(){
+                let self = this
+                self.$ajax.get('/vote/detail/'+ self.voteId)
+                    .then(function (data) {
+                        if (data.code === 1) {
+                            self.vote = data.data
                         }
                     })
             }

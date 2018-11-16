@@ -23,7 +23,6 @@
                  @click="()=>{this.voteList.draftBtnIndex=null}"></div>
 
             <div class="voteList-list" v-if="showVoteList === true">
-
                 <p class="voteList-listTitle">
                     {{voteList.listTitle[voteList.selected]}}（{{voteList.totalElements}}）<span
                     class="voteList-listDraftEmpty" v-if="voteList.selected === 3">一键清空</span>
@@ -39,9 +38,9 @@
                         <div class="voteList-scrollCenter">
                             <p class="voteList-scrollTitle">{{item.voteTitle}}</p>
                             <p class="voteList-scrollInfo">发起人: {{item.createBy}} 参与人数：{{item.participants}}</p>
-                            <p class="voteList-scrollDone" v-if="~~item.isVote === 0">已投票</p>
+                            <p class="voteList-scrollDone" v-if="~~item.isVote === 1">已投票</p>
                         </div>
-                        <div class="voteList-scrollLink">{{item.isVote ? '查看结果' : '去投票'}}</div>
+                        <div class="voteList-scrollLink" @click="toResults(item.isVote,item.voteId)">{{item.isVote ? '查看结果' : '去投票'}}</div>
                     </li>
                 </ul>
                 <ul
@@ -58,10 +57,9 @@
                             <p class="voteList-scrollDo voteList-scrollDoBg" v-if="item.isVote === false">未投票</p>
                             <p class="voteList-scrollDo" v-if="item.isVote === true">已投票</p>
                         </div>
-                        <div class="voteList-scrollLink">查看结果</div>
+                        <div class="voteList-scrollLink" @click="toResults(1,item.voteId)">查看结果</div>
                     </li>
                 </ul>
-
                 <ul
                     v-if="voteList.selected === 2"
                     class="voteList-scrollBox"
@@ -103,7 +101,7 @@
 
         },
         mounted() {
-            this.getData(1)
+            this.getData(this.state,this.voteList.currentPage)
         },
         data() {
             return {
@@ -118,22 +116,32 @@
                     listTitle: ['投票列表', '投票列表', '草稿箱'],
                     totalElements: '',
                     draftData:[],
-                    draftBtnIndex:null
+                    draftBtnIndex:null,
+                    currentPage:1, // 当前页数
+                    state:1,
                 }
             }
         },
         methods: {
-            getData(key) {
+            getData(key,page,loadMore) {
                 let self = this
                 // 投票列表数据初始化
-                self.$ajax.post('vote/page?page=1&size=2', {'state': key})
+                self.$ajax.post('vote/page?size=20&page='+ page, {'state': key})
                     .then(function (data) {
                         if (data.code === 1 && data.data.totalElements > 0) {
                             self.showVoteList = true
-                            self.voteList.onGoingData = data.data
+                            self.showAddVote = false
+                            if(loadMore){
+                                self.voteList.onGoingData.content.push(data.data.content)
+                                self.voteList.currentPage ++
+                                self.voteList.loading = false;
+                            }else{
+                                self.voteList.onGoingData = data.data
+                            }
                             self.voteList.totalElements = data.data.totalElements
                         } else {
                             self.showAddVote = true
+                            self.showVoteList = false
                         }
                     })
             },
@@ -143,7 +151,9 @@
                 self.voteList.selected = key
                 if (key !== 2) {
                      key++
-                    self.getData(key)
+                    self.voteList.currentPage = 1
+                    this.state = key
+                    self.getData(key,self.voteList.currentPage)
                 } else {
                     let data = localStorage.getItem('voteList')
                     if(!data){
@@ -156,10 +166,7 @@
             // 上拉加载
             loadMore() {
                 this.voteList.loading = true;
-                console.log(this.voteList.loading)
-
-                this.voteList.loading = false;
-                console.log(this.voteList.loading)
+                this.getData(this.state,this.voteList.currentPage,1)
             },
             // 点击空白处隐藏草稿箱模块按钮
             showDraftBtn(index,e) {
@@ -183,6 +190,15 @@
             editDraft(index){
                 this.$router.push({path:'/work/createVote',query:{params:index}})
             },
+
+            // 点击跳转结果页 || 投票页
+            toResults(key,id){
+                if(key){
+                    this.$router.push({path:'/work/voteResults',query:{voteId:id}})
+                }else{
+                    this.$router.push({path:'/work/vote',query:{voteId:id}})
+                }
+            }
         },
         components: {
             PublicHeader

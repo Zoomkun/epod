@@ -1,5 +1,8 @@
 <template>
-    <div class="publicHeaderBox"><span class="backBtn" @click="() => {this.$router.go(-1)}">{{headerTitle}}</span></div>
+    <div class="publicHeaderBox">
+        <span class="backBtn" @click="() => {this.$router.go(-1)}">{{headerTitle}}</span>
+
+    </div>
 </template>
 
 <script>
@@ -21,7 +24,9 @@
         height .3rem
         box-sizing border-box
         float left
-        margin .15rem 0 .2rem .15rem
+        width 100%
+        margin .15rem 0 .2rem
+        padding 0 .15rem
 
     .backBtn
         float left

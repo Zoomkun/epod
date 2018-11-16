@@ -108,7 +108,7 @@
             },
             addOption() {
                 let id = this.vote.optionDTOList.length
-                this.vote.optionDTOList.push({content: '', id: id})
+                this.vote.optionDTOList.push({content: ''})
             },
             preview(){
                 let self =this
@@ -117,7 +117,6 @@
                 }
                 self.vote.preview = true
                 let vote = JSON.stringify(self.vote)
-                console.log(vote)
                 self.$router.push({path:'/work/vote',query:{params:vote}})
             },
             // 保存至草稿箱
