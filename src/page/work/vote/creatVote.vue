@@ -146,7 +146,7 @@
                     return false
                 }
 
-                self.$ajax.post('vote/add', self.vote)
+                self.$ajax.post('evote/vote/add', self.vote)
                     .then(function (data) {
                         if (data.code === 1) {
                             self.$router.push('/work/voteList')

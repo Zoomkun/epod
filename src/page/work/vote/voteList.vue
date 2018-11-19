@@ -25,7 +25,7 @@
             <div class="voteList-list" v-if="showVoteList === true">
                 <p class="voteList-listTitle">
                     {{voteList.listTitle[voteList.selected]}}（{{voteList.totalElements}}）<span
-                    class="voteList-listDraftEmpty" v-if="voteList.selected === 3">一键清空</span>
+                    class="voteList-listDraftEmpty" v-if="voteList.selected === 2" @click="emptyDraft">一键清空</span>
                 </p>
                 <ul
                     v-if="voteList.selected === 0"
@@ -125,15 +125,21 @@
         methods: {
             getData(key,page,loadMore) {
                 let self = this
+                let pages = page
+
+                if(loadMore){ // 页码处理
+                    pages = pages+1
+                    self.voteList.currentPage = pages
+                }
                 // 投票列表数据初始化
-                self.$ajax.post('vote/page?size=20&page='+ page, {'state': key})
+                self.$ajax.post('evote/vote/page?size=20&page='+ pages, {'state': key})
                     .then(function (data) {
                         if (data.code === 1 && data.data.totalElements > 0) {
                             self.showVoteList = true
                             self.showAddVote = false
                             if(loadMore){
-                                self.voteList.onGoingData.content.push(data.data.content)
-                                self.voteList.currentPage ++
+                                self.voteList.onGoingData.content = self.voteList.onGoingData.content.concat(data.data.content)
+                                // self.voteList.currentPage ++
                                 self.voteList.loading = false;
                             }else{
                                 self.voteList.onGoingData = data.data
@@ -165,6 +171,10 @@
             },
             // 上拉加载
             loadMore() {
+                if(this.voteList.currentPage == this.voteList.onGoingData.totalPages){
+                    return false
+                }
+
                 this.voteList.loading = true;
                 this.getData(this.state,this.voteList.currentPage,1)
             },
@@ -198,7 +208,11 @@
                 }else{
                     this.$router.push({path:'/work/vote',query:{voteId:id}})
                 }
-            }
+            },
+            emptyDraft(){
+                localStorage.setItem('voteList',null)
+                self.voteList.draftData = []
+            },
         },
         components: {
             PublicHeader
@@ -306,14 +320,14 @@
         background #ffffff
         -webkit-overflow-scrolling: touch
         border-radius .05rem
-        padding .1rem .15rem 0
+        padding .1rem .15rem .15rem
         overflow auto
         height 100%
         box-sizing border-box
 
     .voteList-scrollBox
         width 100%
-        overflow auto
+        /*overflow auto*/
         position relative
         top 0
         bottom 0

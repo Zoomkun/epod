@@ -27,7 +27,7 @@
         methods: {
             submit() {
                 let self = this
-                self.$ajax.put('/user/update?nickName='+ self.userInfo.nickName,)
+                self.$ajax.put('euser/user/update?nickName='+ self.userInfo.nickName,)
                     .then(function (data) {
                         localStorage.setItem('user',JSON.stringify(data.data))
                         if (data.code === 1) {

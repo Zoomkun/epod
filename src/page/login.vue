@@ -32,7 +32,7 @@
         methods: {
             getCode() {
                 let self = this;
-                self.$ajax.get('user/sendCode?phone=' + self.formData.userName, function (data) {
+                self.$ajax.get('euser/user/sendCode?phone=' + self.formData.userName, function (data) {
                     console.log(data)
                     if (data.code === 1) {
                         self.getCodeTime()
@@ -63,10 +63,16 @@
                 }
 
                 self.tips = ''
-                self.$ajax.post('user/user/smsLogin', self.formData)
+                self.$ajax.post('euser/user/user/smsLogin', self.formData)
                     .then(function (data) {
                         if (data.code === 1) {
-                            self.$router.push('project/projectList')
+                            let path = localStorage.getItem('path')
+                            if(path && path.indexOf('login') === -1){
+                                localStorage.setItem('path',null)
+                                self.$router.push(path)
+                            }else{
+                                self.$router.push('project/projectList')
+                            }
                             self.$ajax.defaults.headers.common['token'] = data.data.token;
                             localStorage.setItem('user', JSON.stringify(data.data))
                         }

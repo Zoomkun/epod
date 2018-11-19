@@ -15,7 +15,7 @@ Vue.use( Vuex );
 Vue.use(MintUI)
 Vue.config.productionTip = false;
 
-let url = 'http://test.bcrealm.com/api/evote/';
+let url = 'http://test.bcrealm.com/api/';
 
 var $ajax = axios.create({
     baseURL: url,
@@ -24,8 +24,11 @@ var $ajax = axios.create({
 
 // 添加响应拦截器
 $ajax.interceptors.response.use(function(response) {
-    console.log(this)
-    console.log(response)
+    console.log(router.currentRoute.path)
+    if(response.data.code === 1001){
+        localStorage.setItem('path',router.currentRoute.path)
+        router.push({path:'/login'})
+    }
     // 对响应数据做点什么
     if (response.status === 200) {
         console.log(response.data)

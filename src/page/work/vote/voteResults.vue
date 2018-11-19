@@ -46,7 +46,7 @@
         methods: {
             getData(){
                 let self = this
-                self.$ajax.post('vote/result/'+ self.voteId)
+                self.$ajax.post('evote/vote/result/'+ self.voteId)
                     .then(function (data) {
                         if (data.code === 1) {
                             self.info = data.data

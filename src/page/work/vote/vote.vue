@@ -76,7 +76,7 @@
                     params = self.select.check
                 }
 
-                self.$ajax.post('vote', {optionIds:params,voteId:self .vote.voteId})
+                self.$ajax.post('evote/vote', {optionIds:params,voteId:self .vote.voteId})
                     .then(function (data) {
                         if (data.code === 1) {
                             self.$router.push('/work/voteList')
@@ -86,7 +86,7 @@
             },
             getVoteData(){
                 let self = this
-                self.$ajax.get('/vote/detail/'+ self.voteId)
+                self.$ajax.get('evote/vote/detail/'+ self.voteId)
                     .then(function (data) {
                         if (data.code === 1) {
                             self.vote = data.data

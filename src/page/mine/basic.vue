@@ -253,7 +253,7 @@
 
                 self.$ajax({
                     method: 'post',
-                    url: '/user/photo/upload',
+                    url: 'euser/user/photo/upload',
 
                     processData: false,
                     data: formData
