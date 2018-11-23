@@ -1,7 +1,7 @@
 <template>
     <div class="vote-main">
         <div class="vote-bg"></div>
-        <PublicHeader :header-title="header" style="z-index: 2;position: relative"></PublicHeader>
+        <PublicHeader :header-params="header" style="z-index: 2;position: relative"></PublicHeader>
         <div class="vote-content" style="z-index: 1;position: relative">
             <div class="vote-tips" v-if="isPreview"><span class="vote-tipsIcon"></span>预览模式下不能投票</div>
             <div class="vote-title">[标题] {{vote.voteTitle}}</div>
@@ -34,31 +34,35 @@
     export default {
         name: 'vote',
         mounted() {
-            let data  = this.$route.query.params
-            if(data){
+            let data = this.$route.query.params
+            if (data) {
                 this.isPreview = true
                 this.vote = JSON.parse(data)
-            }else{
+            } else {
                 this.voteId = this.$route.query.voteId
                 this.getVoteData()
             }
         },
         data() {
             return {
-                header: '预览投票',
-                isPreview:false,
-                select:{
-                    check:[],
-                    radio:''
+                header: {
+                    title: '预览投票',
+                    tool:{
+                    }
                 },
-                voteId:null,
-                vote:{}
+                isPreview: false,
+                select: {
+                    check: [],
+                    radio: ''
+                },
+                voteId: null,
+                vote: {}
             }
         },
-        filters:{
-            options(data){
+        filters: {
+            options(data) {
                 // let data = this.vote.optionDTOList
-                for (let i in data){
+                for (let i in data) {
                     data[i].label = data[i].content
                     data[i].value = new String(data[i].optionId)
                 }
@@ -67,16 +71,16 @@
             },
         },
         methods: {
-            submit(){
+            submit() {
                 let self = this
                 let params = []
-                if(~~self.vote.optionType === 2){
+                if (~~self.vote.optionType === 2) {
                     params.push(self.select.radio)
-                }else{
+                } else {
                     params = self.select.check
                 }
 
-                self.$ajax.post('evote/vote', {optionIds:params,voteId:self .vote.voteId})
+                self.$ajax.post('evote/vote', {optionIds: params, voteId: self.vote.voteId})
                     .then(function (data) {
                         if (data.code === 1) {
                             self.$router.push('/work/voteList')
@@ -84,12 +88,24 @@
                         }
                     })
             },
-            getVoteData(){
+            getVoteData() {
                 let self = this
-                self.$ajax.get('evote/vote/detail/'+ self.voteId)
+                self.$ajax.get('evote/vote/detail/' + self.voteId)
                     .then(function (data) {
                         if (data.code === 1) {
                             self.vote = data.data
+
+                            if(data.data.isCreateBy){
+
+                                self.header.tool.delete = true
+
+                                if(data.data.state !== 2 && data.data.participants === 0){
+                                    self.header.tool.edit = true
+                                }
+                                if(data.data.state !== 2){
+                                    self.header.tool.shutDown = true
+                                }
+                            }
                         }
                     })
             }
@@ -147,7 +163,7 @@
         margin .3rem 0 .16rem
         float left
 
-    .vote-endTime ,.vote-desc
+    .vote-endTime, .vote-desc
         width 100%
         float left
         color #BBBFFF
@@ -168,7 +184,7 @@
         margin-top .26rem
         border-radius .05rem
 
-        .vote-radioList,.vote-checkBoxList
+        .vote-radioList, .vote-checkBoxList
 
             .mint-cell
                 color #444D6A
@@ -177,12 +193,12 @@
                 .mint-cell-wrapper
                     padding 0
 
-                    .mint-radiolist-label,.mint-checklist-label
+                    .mint-radiolist-label, .mint-checklist-label
                         padding 0
 
-                        .mint-radio-input:checked + .mint-radio-core,.mint-checkbox-input:checked + .mint-checkbox-core
-                                background-color: #5871FF;
-                                border-color: #5871FF;
+                        .mint-radio-input:checked + .mint-radio-core, .mint-checkbox-input:checked + .mint-checkbox-core
+                            background-color: #5871FF;
+                            border-color: #5871FF;
 
     .vote-releaseBtn
         color #ffffff

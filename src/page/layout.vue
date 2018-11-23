@@ -3,17 +3,17 @@
         <div class="main">
             <router-view/>
         </div>
-        <!--<div class="table">-->
-            <!--<router-link to="/project/projectList" class="tableCell" :class="active == 1 ? 'layout-active' : ''"-->
-                         <!--@click.native="changeActive(1)">项目-->
-            <!--</router-link>-->
-            <!--<router-link to="/work/workIndex" class="tableCell" :class="active == 2 ? 'layout-active' : ''"-->
-                         <!--@click.native="changeActive(2)">工作-->
-            <!--</router-link>-->
-            <!--<router-link to="/mine/personal" class="tableCell" :class="active == 3 ? 'layout-active' : ''"-->
-                         <!--@click.native="changeActive(3)">我的-->
-            <!--</router-link>-->
-        <!--</div>-->
+        <div class="table">
+            <router-link to="/project/projectList" class="tableCell" :class="active == 1 ? 'layout-active' : ''"
+                         @click.native="changeActive(1)">项目
+            </router-link>
+            <router-link to="/work/workIndex" class="tableCell" :class="active == 2 ? 'layout-active' : ''"
+                         @click.native="changeActive(2)">工作
+            </router-link>
+            <router-link to="/mine/personal" class="tableCell" :class="active == 3 ? 'layout-active' : ''"
+                         @click.native="changeActive(3)">我的
+            </router-link>
+        </div>
     </div>
 </template>
 
@@ -49,7 +49,6 @@
                 } else if (to.path.indexOf('/mine/') > -1) {
                     this.active = 3
                 }
-                console.log(to)
             }
         },
         beforeRouteEnter(to, form, next) {
@@ -84,7 +83,7 @@
     .main
         box-sizing border-box
         flex 1
-        overflow auto
+        overflow hidden
 
     .table
         height .4rem

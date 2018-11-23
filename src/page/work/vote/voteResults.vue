@@ -1,6 +1,6 @@
 <template>
-    <div class="voteResults-main">
-        <PublicHeader :header-title="header"></PublicHeader>
+    <div class="voteResults-main small-bg">
+        <PublicHeader :header-params="header"></PublicHeader>
         <div class="voteResults-content">
             <div class="voteResults-info clear">
                 <div class="voteResults-topIcon" :class="{'active': info.isVote}"></div>
@@ -8,16 +8,22 @@
                 <div class="voteResults-title">[标题] {{info.voteTitle}}</div>
                 <div class="voteResults-desc">{{info.voteDesc}}</div>
                 <div class="voteResults-endTime">截止日期：{{info.endTime}}</div>
-                <div class="voteResults-done">投票状态：<span class="voteResults-voteState" :class="{active:info.state == 1}">{{state[info.state-1]}}</span></div>
-                <div class="voteResults-link"><span>投票链接：</span><span class="voteResults-linkInfo">http://wwwwwwwwwwwwwww.qqq.co... </span><span class="voteResults-copy">复制</span></div>
+                <div class="voteResults-done">投票状态：<span class="voteResults-voteState"
+                                                         :class="{active:info.state == 1}">{{state[info.state-1]}}</span>
+                </div>
+                <div class="voteResults-link"><span>投票链接：</span><span class="voteResults-linkInfo">{{this.$route.fullPath}}</span><span
+                    class="voteResults-copy">复制</span></div>
             </div>
             <div class="voteResults-options">
                 <div class="voteResults-optionsTitle">投票统计</div>
-                <div class="voteResults-optionsRadio">投票选项：  <span class="voteResults-optionsFontColor">{{info.optionType === 1 ? '多选' : '单选'}}</span></div>
-                <div class="voteResults-optionsJoiner">参与人数： <span class="voteResults-optionsFontColor">{{info.participants}}</span> </div>
+                <div class="voteResults-optionsRadio">投票选项： <span class="voteResults-optionsFontColor">{{info.optionType === 1 ? '多选' : '单选'}}</span>
+                </div>
+                <div class="voteResults-optionsJoiner">参与人数： <span class="voteResults-optionsFontColor">{{info.participants}}</span>
+                </div>
 
                 <div v-for="item in info.optionDTOList ">
-                    <p class="voteResults-optionsDesc">{{item.content}}&nbsp;&nbsp;{{item.amount}}<span class="voteResults-percentage">{{item.amount}}%</span></p>
+                    <p class="voteResults-optionsDesc">{{item.content}}&nbsp;&nbsp;{{item.amount}}<span
+                        class="voteResults-percentage">{{item.amount*100}}%</span></p>
                     <mt-progress :value="20" :bar-height="10"></mt-progress>
                 </div>
 
@@ -37,19 +43,39 @@
         },
         data() {
             return {
-                header: "查看结果",
-                voteId:'',
-                state:['进行中','已结束','编辑中'],
-                info:{}
+                header: {
+                    title: "查看结果",
+                    tool:{
+
+                    }
+                },
+                voteId: '',
+                state: ['进行中', '已结束', '编辑中'],
+                info: {}
             }
         },
         methods: {
-            getData(){
+            getData() {
                 let self = this
-                self.$ajax.post('evote/vote/result/'+ self.voteId)
+                self.$ajax.post('evote/vote/result/' + self.voteId)
                     .then(function (data) {
                         if (data.code === 1) {
                             self.info = data.data
+                            data.data.isCreateBy = true
+                            if(data.data.isCreateBy){
+                                self.$set(self.header.tool,'delete',true)
+
+                                if(data.data.state !== 2 && data.data.participants === 0){
+                                    self.$set(self.header.tool,'edit',true)
+                                }
+                                if(data.data.state !== 2){
+                                    self.$set(self.header.tool,'shutDown',true)
+                                }
+                            }
+                            console.log(self.header.tool)
+                            self.$set(self.header.tool,'edit',true)// todo
+
+                            console.log(self.header.tool)
                         }
                     })
             }
@@ -66,8 +92,6 @@
         width 100%
         height 100%
         box-sizing border-box
-        background url("../../../assets/images/vote_topbg.png") no-repeat top left #DAE2ED
-        background-size 100%
 
     .voteResults-content
         width 100%
@@ -75,7 +99,7 @@
         padding .15rem
         float left
 
-    .voteResults-info,.voteResults-options
+    .voteResults-info, .voteResults-options
         width 100%
         position relative
         box-sizing border-box
@@ -124,7 +148,7 @@
         color #444D6A
         margin-top .33rem
 
-    .voteResults-desc,.voteResults-endTime,.voteResults-done,.voteResults-link
+    .voteResults-desc, .voteResults-endTime, .voteResults-done, .voteResults-link
         height .16rem
         line-height .16rem
         width 100%
@@ -141,7 +165,7 @@
     .voteResults-link
         display flex
         height .3rem
-        line-height  .3rem
+        line-height .3rem
         margin-top .1rem
 
     .voteResults-copy
@@ -180,7 +204,7 @@
     .voteResults-optionsJoiner
         color #9AADBF
 
-        margin-bottom  .15rem
+        margin-bottom .15rem
         height .46rem
         line-height .46rem
         border-bottom 1px solid #DAE2ED

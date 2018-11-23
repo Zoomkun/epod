@@ -17,7 +17,6 @@
         mounted() {
             let data = JSON.parse(localStorage.getItem('user'))
             this.userInfo = data
-            console.log(data)
         },
         data() {
             return {
@@ -38,7 +37,6 @@
                     })
             },
             delName() {
-                console.log(this.userInfo.nickName)
                 this.userInfo.nickName = ''
             }
         }

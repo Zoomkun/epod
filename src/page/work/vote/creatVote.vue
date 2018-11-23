@@ -1,11 +1,14 @@
 <template>
-    <div class="createVote-main">
-        <PublicHeader :header-title="header"></PublicHeader>
-        <div class="createVote-content">
+    <div class="createVote-main small-bg">
+        <div class="createVote-top">
+            <PublicHeader :header-params="header"></PublicHeader>
             <mt-navbar v-model="selected" class="createVote-navBar">
                 <mt-tab-item id="1">选项一</mt-tab-item>
                 <mt-tab-item id="2">选项二</mt-tab-item>
             </mt-navbar>
+        </div>
+        <div class="createVote-content">
+
             <mt-tab-container v-model="selected" class="createVote-containerItem">
                 <mt-tab-container-item id="1">
                     <input type="text" v-model="vote.voteTitle" class="createVote-title inputStyle"
@@ -55,12 +58,13 @@
                 </mt-tab-container-item>
 
             </mt-tab-container>
+            <mt-datetime-picker
+                ref="picker"
+                type="date"
+                @confirm="dateFilter">
+            </mt-datetime-picker>
         </div>
-        <mt-datetime-picker
-            ref="picker"
-            type="date"
-            @confirm="dateFilter">
-        </mt-datetime-picker>
+
     </div>
 </template>
 
@@ -80,7 +84,7 @@
         data() {
             return {
                 selected: '1',
-                header: "创建投票",
+                header: {title:"创建投票"},
                 draftId:null,
                 vote: {
                     endTime: "",
@@ -168,9 +172,26 @@
                 }
             },
             openDateTimer(e) {
+                console.log(e)
                 if (~~e === 3) {
                     this.$refs.picker.open();
+                }else if(~~e === 1){
+                    this.vote.endTime = this.calculationDate(1)
+                }else if(~~e === 2){
+                    this.vote.endTime = this.calculationDate(7)
                 }
+                console.log(this.vote.endTime)
+            },
+            calculationDate(key){
+                var nowDate = new Date(Date.parse(new Date()) + (key * 24 * 3600 * 1000));
+                var y = nowDate.getFullYear();
+                var m = nowDate.getMonth() + 1;
+                var d = nowDate.getDate();
+                var h = nowDate.getHours();
+                var _m = nowDate.getMinutes();
+                var s = nowDate.getSeconds();
+
+                return y + '-' + m + '-' + d+'  '+h+':'+_m
             },
             dateFilter(e) {
                 this.vote.endTime = e.getFullYear() + '-' + (e.getMonth() + 1) + '-' + e.getDate()
@@ -206,15 +227,27 @@
         width 100%
         height 100%
         box-sizing border-box
-        background url("../../../assets/images/vote_topbg.png") no-repeat top left #DAE2ED
-        background-size 100%
+        display -webkit-box
+        display -ms-flexbox
+        display flex
+        -webkit-box-orient vertical
+        -ms-flex-direction column
+        flex-direction column
+
+    .createVote-top
+        height 1.17rem
+        width 100%
+
 
     .createVote-containerItem
         background #fff
         padding 0 .15rem .1rem
 
     .createVote-navBar
+        padding 0 .15rem
         width 100%
+        box-sizing border-box
+        background-color unset
         height .52rem
         overflow hidden
         border-radius: 0.05rem 0.05rem 0 0;
@@ -222,6 +255,12 @@
         .mint-tab-item
             color #9AADBF
             background #D2DDEF
+
+            &:nth-child(1)
+                border-radius: 0.05rem 0 0 0;
+
+            &:nth-child(2)
+                border-radius: 0 0.05rem 0 0;
 
             .mint-tab-item-label
                 font-size .17rem
@@ -235,6 +274,8 @@
 
     .createVote-content
         padding 0 .15rem
+        flex 1
+        overflow auto
 
     .inputStyle
         border none

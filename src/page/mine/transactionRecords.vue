@@ -52,7 +52,6 @@
             self.scroll = new BScroll(wrapper, {
                 click: true, probeType: 2,})
             self.scroll.on('scroll', (pos) => {
-                console.log(pos)
             })
         }
         ,
@@ -84,10 +83,6 @@
         }
         ,
         methods: {
-            onScroll(e) {
-                console.log(e)
-            }
-            ,
             timerFixed(event) {
                 let self = this
                 let target = event.target

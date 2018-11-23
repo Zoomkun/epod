@@ -11,6 +11,8 @@ import VoteResults from '@/page/work/vote/voteResults.vue'
 
 // 行情
 import MyMarket from '@/page/work/market/myMarket.vue'
+import CoinExchange from '@/page/work/market/coinExchange.vue'
+import CoinRecharge from '@/page/work/market/coinRecharge.vue'
 import WorkIndex from '@/page/work/index.vue'
 
 // 项目
@@ -76,6 +78,16 @@ export default new Router({
                     name: 'voteResults',
                     component: VoteResults,
                     path: 'voteResults'
+                },
+                {
+                    name: 'coinExchange',
+                    component: CoinExchange,
+                    path: 'coinExchange'
+                },
+                {
+                    name: 'coinRecharge',
+                    component: CoinRecharge,
+                    path: 'coinRecharge'
                 }
             ]
         },

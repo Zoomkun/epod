@@ -6,11 +6,15 @@ import axios from 'axios'
 import Vuex from 'vuex'
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
+import '../static/css/common.styl'
+
+import VueClipboards from 'vue-clipboard2'
 // import VConsole from 'vconsole'
 // let vConsole = new VConsole();//初始化
 //
 // Vue.use(vConsole);//设为全局
-
+VueClipboards.config.autoSetContainer = true
+Vue.use(VueClipboards);
 Vue.use( Vuex );
 Vue.use(MintUI)
 Vue.config.productionTip = false;
@@ -24,9 +28,8 @@ var $ajax = axios.create({
 
 // 添加响应拦截器
 $ajax.interceptors.response.use(function(response) {
-    console.log(router.currentRoute.path)
     if(response.data.code === 1001){
-        localStorage.setItem('path',router.currentRoute.path)
+        localStorage.setItem('path',router.currentRoute.fullPath)
         router.push({path:'/login'})
     }
     // 对响应数据做点什么
@@ -51,17 +54,4 @@ new Vue({
     template: '<App/>',
     components: { App }
 })
-// router.beforeEach((to, from,next) => {
-//     if(to.path.indexOf('/vote/')>-1){
-//         console.log(store)
-//         store.commit('setAction',1)
-//     }else if(to.path.indexOf('/market/')>-1){
-//         console.log(store)
-//         // store.commit('setAction',2)
-//     }else if(to.path.indexOf('/mine/')>-1){
-//         console.log(store)
-//         // store.commit('setAction',3)
-//     }
-//     next();
-// })
 

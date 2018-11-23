@@ -47,7 +47,6 @@
                 if (!files.length) return;
                 this.picValue = files[0];
                 this.imgPreview(this.picValue);
-                console.log(this.picValue)
             },
             imgPreview(file) {
                 let self = this;
@@ -220,7 +219,6 @@
 
                 //convertBase64UrlToBlob函数是将base64编码转换;为Blob
                 formData.append("file",self.convertBase64UrlToBlob(ndata), Date.now() + '.jpg');
-                console.log(self.convertBase64UrlToBlob(ndata))
                 return formData;
             },
             convertBase64UrlToBlob(base64Data){

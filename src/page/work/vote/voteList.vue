@@ -1,7 +1,7 @@
 <template>
     <div class="voteList-main">
         <div class="voteList-top clear">
-            <PublicHeader :header-title="header"></PublicHeader>
+            <PublicHeader :header-params="header"></PublicHeader>
             <div class="voteList-navBar" v-if="showVoteList=== true">
                 <span class="voteList-barOnGoing" :class="voteList.selected === 0 ? 'active': ''"
                       @click="modelChange(0)"><em>进行中</em></span>
@@ -40,7 +40,9 @@
                             <p class="voteList-scrollInfo">发起人: {{item.createBy}} 参与人数：{{item.participants}}</p>
                             <p class="voteList-scrollDone" v-if="~~item.isVote === 1">已投票</p>
                         </div>
-                        <div class="voteList-scrollLink" @click="toResults(item.isVote,item.voteId)">{{item.isVote ? '查看结果' : '去投票'}}</div>
+                        <div class="voteList-scrollLink" @click="toResults(item.isVote,item.voteId)">{{item.isVote ?
+                            '查看结果' : '去投票'}}
+                        </div>
                     </li>
                 </ul>
                 <ul
@@ -101,11 +103,15 @@
 
         },
         mounted() {
-            this.getData(this.state,this.voteList.currentPage)
+            this.getData(this.state, this.voteList.currentPage)
         },
         data() {
             return {
-                header: '我的投票',
+                header: {
+                    title: '我的投票',
+                    search:true,
+                    create:true,
+                },
                 showVoteList: true, // 是否展示列表
                 showAddVote: false, // 是否添加
                 voteList: {//列表数据
@@ -115,33 +121,33 @@
                     onGoingData: {}, // 进行中数据
                     listTitle: ['投票列表', '投票列表', '草稿箱'],
                     totalElements: '',
-                    draftData:[],
-                    draftBtnIndex:null,
-                    currentPage:1, // 当前页数
-                    state:1,
+                    draftData: [],
+                    draftBtnIndex: null,
+                    currentPage: 1, // 当前页数
+                    state: 1,
                 }
             }
         },
         methods: {
-            getData(key,page,loadMore) {
+            getData(key, page, loadMore) {
                 let self = this
                 let pages = page
 
-                if(loadMore){ // 页码处理
-                    pages = pages+1
+                if (loadMore) { // 页码处理
+                    pages = pages + 1
                     self.voteList.currentPage = pages
                 }
                 // 投票列表数据初始化
-                self.$ajax.post('evote/vote/page?size=20&page='+ pages, {'state': key})
+                self.$ajax.post('evote/vote/page?size=20&page=' + pages, {'state': key})
                     .then(function (data) {
                         if (data.code === 1 && data.data.totalElements > 0) {
                             self.showVoteList = true
                             self.showAddVote = false
-                            if(loadMore){
+                            if (loadMore) {
                                 self.voteList.onGoingData.content = self.voteList.onGoingData.content.concat(data.data.content)
                                 // self.voteList.currentPage ++
                                 self.voteList.loading = false;
-                            }else{
+                            } else {
                                 self.voteList.onGoingData = data.data
                             }
                             self.voteList.totalElements = data.data.totalElements
@@ -156,13 +162,13 @@
                 let self = this
                 self.voteList.selected = key
                 if (key !== 2) {
-                     key++
+                    key++
                     self.voteList.currentPage = 1
                     this.state = key
-                    self.getData(key,self.voteList.currentPage)
+                    self.getData(key, self.voteList.currentPage)
                 } else {
                     let data = localStorage.getItem('voteList')
-                    if(!data){
+                    if (!data) {
                         return false
                     }
                     self.voteList.draftData = JSON.parse(localStorage.getItem('voteList'))
@@ -171,25 +177,25 @@
             },
             // 上拉加载
             loadMore() {
-                if(this.voteList.currentPage == this.voteList.onGoingData.totalPages){
+                if (this.voteList.currentPage == this.voteList.onGoingData.totalPages) {
                     return false
                 }
 
                 this.voteList.loading = true;
-                this.getData(this.state,this.voteList.currentPage,1)
+                this.getData(this.state, this.voteList.currentPage, 1)
             },
             // 点击空白处隐藏草稿箱模块按钮
-            showDraftBtn(index,e) {
+            showDraftBtn(index, e) {
                 let self = this
-                if(e.target.className.indexOf('voteList-draftDel')>-1){
+                if (e.target.className.indexOf('voteList-draftDel') > -1) {
                     self.voteList.draftBtnIndex = null
-                }else{
+                } else {
                     self.voteList.draftBtnIndex = index
                 }
 
             },
             // 删除草稿
-            delDraft(index){
+            delDraft(index) {
                 let self = this
                 self.voteList.draftData.splice(index, 1)
                 localStorage.setItem('voteList', JSON.stringify(self.voteList.draftData))
@@ -197,20 +203,20 @@
             },
 
             // 编辑草稿
-            editDraft(index){
-                this.$router.push({path:'/work/createVote',query:{params:index}})
+            editDraft(index) {
+                this.$router.push({path: '/work/createVote', query: {params: index}})
             },
 
             // 点击跳转结果页 || 投票页
-            toResults(key,id){
-                if(key){
-                    this.$router.push({path:'/work/voteResults',query:{voteId:id}})
-                }else{
-                    this.$router.push({path:'/work/vote',query:{voteId:id}})
+            toResults(key, id) {
+                if (key) {
+                    this.$router.push({path: '/work/voteResults', query: {voteId: id}})
+                } else {
+                    this.$router.push({path: '/work/vote', query: {voteId: id}})
                 }
             },
-            emptyDraft(){
-                localStorage.setItem('voteList',null)
+            emptyDraft() {
+                localStorage.setItem('voteList', null)
                 self.voteList.draftData = []
             },
         },

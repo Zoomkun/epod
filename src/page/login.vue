@@ -33,7 +33,6 @@
             getCode() {
                 let self = this;
                 self.$ajax.get('euser/user/sendCode?phone=' + self.formData.userName, function (data) {
-                    console.log(data)
                     if (data.code === 1) {
                         self.getCodeTime()
                     }
