@@ -1,12 +1,15 @@
 <template>
     <div class="vote-main">
         <div class="vote-bg"></div>
-        <PublicHeader :header-params="header" style="z-index: 2;position: relative"></PublicHeader>
+
         <div class="vote-content" style="z-index: 1;position: relative">
-            <div class="vote-tips" v-if="isPreview"><span class="vote-tipsIcon"></span>预览模式下不能投票</div>
-            <div class="vote-title">[标题] {{vote.voteTitle}}</div>
-            <div class="vote-desc" v-if="vote.voteDesc">{{vote.voteDesc}}</div>
-            <div class="vote-endTime">截止日期: {{vote.endTime}}</div>
+            <div class="vote-header" :class="{active:isPreview}">
+                <PublicHeader :header-params="header" style="z-index: 2;position: relative"></PublicHeader>
+                <div class="vote-tips" v-if="isPreview"><span class="vote-tipsIcon"></span>预览模式下不能投票</div>
+                <div class="vote-title">[标题] {{vote.voteTitle}}</div>
+                <div class="vote-desc" v-if="vote.voteDesc">{{vote.voteDesc}}</div>
+                <div class="vote-endTime">截止日期: {{vote.endTime}}</div>
+            </div>
             <div class="vote-box">
                 <div class="vote-type">投票选项（多选）</div>
                 <mt-radio
@@ -46,9 +49,8 @@
         data() {
             return {
                 header: {
-                    title: '预览投票',
-                    tool:{
-                    }
+                    title: '投票',
+                    tool: {}
                 },
                 isPreview: false,
                 select: {
@@ -95,15 +97,14 @@
                         if (data.code === 1) {
                             self.vote = data.data
 
-                            if(data.data.isCreateBy){
+                            if (data.data.isCreateBy) {
+                                self.$set(self.header.tool, 'delete', true)
 
-                                self.header.tool.delete = true
-
-                                if(data.data.state !== 2 && data.data.participants === 0){
-                                    self.header.tool.edit = true
+                                if (data.data.state !== 2 && data.data.participants === 0) {
+                                    self.$set(self.header.tool, 'edit', true)
                                 }
-                                if(data.data.state !== 2){
-                                    self.header.tool.shutDown = true
+                                if (data.data.state !== 2) {
+                                    self.$set(self.header.tool, 'shutDown', true)
                                 }
                             }
                         }
@@ -124,8 +125,27 @@
         box-sizing border-box
         background: linear-gradient(126deg, rgba(87, 72, 234, 1), rgba(93, 127, 251, 1));
 
+    .vote-header
+        height 1.5rem
+        width 100%
+
+        &.active
+            height 1.9rem
+
+            .vote-title
+                margin-top .3rem
+
     .vote-content
         padding 0 .15rem
+        box-sizing border-box
+        width 100%
+        height 100%
+        display -webkit-box
+        display -ms-flexbox
+        display flex
+        -webkit-box-orient vertical
+        -ms-flex-direction column
+        flex-direction column
 
     .vote-bg
         width 100%
@@ -160,7 +180,7 @@
         font-size .21rem
         text-align left
         width 100%
-        margin .3rem 0 .16rem
+        margin-bottom .16rem
         float left
 
     .vote-endTime, .vote-desc
@@ -171,7 +191,7 @@
         font-size .16rem
         height .16rem
         line-height .16rem
-        margin-top .08rem
+        margin-bottom .08rem
 
     .vote-box
         width 100%
@@ -180,8 +200,9 @@
         background #ffffff
         color #444D6A
         font-size .16rem
-        float left
-        margin-top .26rem
+        flex 1
+        overflow auto
+        margin .26rem 0 .15rem
         border-radius .05rem
 
         .vote-radioList, .vote-checkBoxList

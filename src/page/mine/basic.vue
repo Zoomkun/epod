@@ -16,11 +16,10 @@
             <span class="basic-phone">{{userInfo.userName}}</span>
         </div>
         <div class="basic-changeHead" :class="active === true ? 'basic-changeHead-enter' :'basic-changeHead-leave'">
-            <p class="basic-changePhoto">从相册中选取
+            <p class="basic-changePhoto">更换头像
                 <input class="basic-changePhotoBtn" type="file" id='uploadFile' accept="image/*"
                        v-on:change="upload($event)">
             </p>
-            <p class="basic-changeCamera" @click="imgPreview">拍照</p>
             <p class="basic-changeE">取消</p>
         </div>
     </section>
@@ -38,7 +37,7 @@
         data() {
             return {
                 userInfo: {},
-                active: true,
+                active: false,
             }
         },
         methods: {
@@ -87,7 +86,7 @@
                 let self =this
                 self.$ajax({
                     method: 'post',
-                    url: '/user/photo/upload',
+                    url: 'euser/user/photo/upload',
 
                     processData: false,
                     data: self.headerImage

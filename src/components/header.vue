@@ -2,7 +2,7 @@
     <div class="publicHeaderBox">
         <span class="backBtn" @click="() => {this.$router.go(-1)}">{{headerParams.title}}</span>
         <div v-if="headerParams.search" class="publicHeader-search"></div>
-        <div v-if="headerParams.create" class="publicHeader-createVote"></div>
+        <router-link to="/work/createVote" v-if="headerParams.create" class="publicHeader-createVote"></router-link>
         <div class="publicHeader-tool" v-if="toolBox" @click="showTool($event)">
             <div class="publicHeader-mask" v-if="toolShow" @click="()=>{this.toolShow=false}"></div>
             <p class="publicHeader-toolBox" v-if="toolShow">
@@ -53,8 +53,9 @@
                 let self = this
                 self.$ajax.delete('evote/vote/' + self.voteId)
                     .then(function (data) {
+
                         if (data.code === 1) {
-                            self.$router.push('/work/vote?voteId=' + self.voteId)
+                            self.$router.push({path: '/work/createVote', query: {voteId: self.voteId,edit:true}})
                         }
                     })
             },

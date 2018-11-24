@@ -47,8 +47,8 @@ module.exports = {
 
     build: {
         // Template for index.html
-        index: path.resolve(__dirname, '../realm/index.html'),
-        assetsRoot: path.resolve(__dirname, '../realm'),
+        index: path.resolve(__dirname, '../epod/index.html'),
+        assetsRoot: path.resolve(__dirname, '../epod'),
         // Path
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',

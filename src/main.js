@@ -47,6 +47,14 @@ Vue.prototype.$ajax = $ajax;
 Vue.prototype.$axios = axios;
 /* eslint-disable no-new */
 
+router.beforeEach(function (to, from, next) {
+    //跳转至上述3个页面
+    if (!to.name) {
+        router.push({name:'login'})
+    }
+    next();
+});
+
 new Vue({
     el: '#app',
     router,

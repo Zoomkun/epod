@@ -3,7 +3,7 @@
         <div class="main">
             <router-view/>
         </div>
-        <div class="table">
+        <div class="table" v-if="showTable">
             <router-link to="/project/projectList" class="tableCell" :class="active == 1 ? 'layout-active' : ''"
                          @click.native="changeActive(1)">项目
             </router-link>
@@ -32,7 +32,8 @@
         },
         data() {
             return {
-                active: 1
+                active: 1,
+                showTable:true
             }
         },
         methods: {
@@ -49,6 +50,13 @@
                 } else if (to.path.indexOf('/mine/') > -1) {
                     this.active = 3
                 }
+
+                if(to.name === 'workIndex' || to.name === 'personal' || to.name === 'projectList'){
+                    this.showTable = true
+                }else{
+                    this.showTable = false
+                }
+                console.log(to)
             }
         },
         beforeRouteEnter(to, form, next) {

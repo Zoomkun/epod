@@ -1,11 +1,11 @@
 <template>
     <section class="assets-box">
         <strong class="assets-all">总资产：$4500</strong>
-        <p class="assets-list">
-            <span class="assets-name"> BCR</span>
-            <span class="assets-num">1000个</span>
-            <span class="assets-money">￥200</span>
-            <router-link class="assets-btn" to="/mine/TransactionRecords">> </router-link>
+        <p class="assets-list" v-for="item in assetsData">
+            <span class="assets-name"> {{item.name}}</span>
+            <span class="assets-num">{{item.value}}个</span>
+            <span class="assets-money">${{item.usdValue||0}}</span>
+            <router-link class="assets-btn" :to="{path:'/mine/TransactionRecords',query:{code:item.code}}">> </router-link>
         </p>
     </section>
 </template>
@@ -16,6 +16,7 @@
         mounted() {
             let data = JSON.parse(localStorage.getItem('user'))
             this.userInfo = data
+            this.getAssets()
         },
         data() {
             return {
@@ -25,7 +26,13 @@
         },
         methods: {
             getAssets(){
-
+                let self = this
+                self.$ajax.get('easset/asset/info')
+                    .then(function (data) {
+                        if (data.code === 1) {
+                            self.assetsData = data.data.assets
+                        }
+                    })
             }
         }
     }

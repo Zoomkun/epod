@@ -140,16 +140,16 @@
                 // 投票列表数据初始化
                 self.$ajax.post('evote/vote/page?size=20&page=' + pages, {'state': key})
                     .then(function (data) {
-                        if (data.code === 1 && data.data.totalElements > 0) {
+                        if (data.code === 1 && data.data.totalElements > 0 || self.voteList.selected!==2) {
                             self.showVoteList = true
                             self.showAddVote = false
                             if (loadMore) {
                                 self.voteList.onGoingData.content = self.voteList.onGoingData.content.concat(data.data.content)
                                 // self.voteList.currentPage ++
-                                self.voteList.loading = false;
                             } else {
                                 self.voteList.onGoingData = data.data
                             }
+                            self.voteList.loading = false;
                             self.voteList.totalElements = data.data.totalElements
                         } else {
                             self.showAddVote = true
@@ -171,7 +171,8 @@
                     if (!data) {
                         return false
                     }
-                    self.voteList.draftData = JSON.parse(localStorage.getItem('voteList'))
+                    let draftData = JSON.parse(localStorage.getItem('voteList'))
+                    draftData ? self.voteList.draftData = draftData : self.voteList.draftData = [];
                     self.voteList.totalElements = self.voteList.draftData.length
                 }
             },
@@ -204,7 +205,8 @@
 
             // 编辑草稿
             editDraft(index) {
-                this.$router.push({path: '/work/createVote', query: {params: index}})
+                console.log(index)
+                this.$router.push({path: '/work/createVote', query: {voteIndex: index,draft:true}})
             },
 
             // 点击跳转结果页 || 投票页
@@ -216,7 +218,7 @@
                 }
             },
             emptyDraft() {
-                localStorage.setItem('voteList', null)
+                localStorage.setItem('voteList', [])
                 self.voteList.draftData = []
             },
         },
@@ -239,6 +241,7 @@
         -webkit-flex-direction column
         flex-direction column
         background url("../../../assets/images/topBg.png") no-repeat top left #DAE2ED
+        background-size 100%
 
     .voteList-top
         height .7rem

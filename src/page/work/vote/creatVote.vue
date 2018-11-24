@@ -75,19 +75,24 @@
     export default {
         name: 'createVote',
         mounted() {
-            let draftId = this.$route.query.params
-            if(draftId){
-                this.draftId = draftId
-                this.vote = JSON.parse(localStorage.getItem('voteList'))[draftId]
+            let data = this.$route.query
+            console.log(data)
+            if (data && data.draft) {
+                this.draftId = data.voteIndex
+                this.vote = JSON.parse(localStorage.getItem('voteList'))[data.voteIndex]
+            } else if (data && data.edit) {
+                this.editData = data
+                this.getEditData()
             }
         },
         data() {
             return {
                 selected: '1',
-                header: {title:"创建投票"},
-                draftId:null,
+                header: {title: "创建投票"},
+                draftId: null,
+                editData: null,
                 vote: {
-                    endTime: "",
+                    endTime: this.calculationDate(1),
                     endTimeType: '1',
                     id: 0,
                     optionDTOList: [
@@ -107,6 +112,16 @@
             }
         },
         methods: {
+            // 编辑
+            getEditData() {
+                let self = this
+                self.$ajax.get('evote/vote/detail/' + self.editData.voteId,)
+                    .then(function (data) {
+                        if (data.code === 1) {
+                            self.vote = data.data
+                        }
+                    })
+            },
             removeOption(index) {
                 this.vote.optionDTOList.splice(index, 1)
             },
@@ -114,50 +129,58 @@
                 let id = this.vote.optionDTOList.length
                 this.vote.optionDTOList.push({content: ''})
             },
-            preview(){
-                let self =this
-                if(self.validForm()){
+            preview() {
+                let self = this
+                if (!self.validForm()) {
+                    console.log(1)
                     return false
                 }
                 self.vote.preview = true
                 let vote = JSON.stringify(self.vote)
-                self.$router.push({path:'/work/vote',query:{params:vote}})
+                localStorage.setItem('preview', vote)
+                self.$router.push({path: '/work/vote', query: {params: vote}})
             },
             // 保存至草稿箱
             saveDraft() {
                 let self = this
-                if(self.validForm()){
+                if (!self.validForm()) {
                     return false
                 }
 
                 // TODO：优化
-                if(localStorage.getItem('voteList')){
+                if (localStorage.getItem('voteList')) {
                     let voteList = JSON.parse(localStorage.getItem('voteList'))
-                    if(voteList.length>19){
+                    if (voteList && voteList.length > 19) {
                         Toast('草稿箱最多保存20条');
                         return false
                     }
                     voteList.push(self.vote)
-                   localStorage.setItem('voteList', JSON.stringify(voteList))
-                }else{
+                    localStorage.setItem('voteList', JSON.stringify(voteList))
+                } else {
                     localStorage.setItem('voteList', JSON.stringify([self.vote]))
                 }
             },
             // 投票发布
-            releaseVote(){
+            releaseVote() {
                 let self = this
-                if(self.validForm()){
+                if (!self.validForm()) {
                     return false
                 }
+                let request = {}
+                self.editData
+                    ?
+                    request = {method: 'put', url: 'evote/vote/update'}
+                    :
+                    request = {method: 'post', url: 'evote/vote/add'};
 
-                self.$ajax.post('evote/vote/add', self.vote)
+                self.$ajax[request.method](request.url, self.vote)
                     .then(function (data) {
                         if (data.code === 1) {
                             self.$router.push('/work/voteList')
-                            if(self.draftId){
+                            if (self.draftId) {
                                 let draftData = JSON.parse(localStorage.getItem('voteList'))
-                                draftData.splice(self.draftId,1)
-                                localStorage.setItem('voteList',JSON.stringify(draftData))
+                                draftData.splice(self.draftId, 1)
+                                localStorage.setItem('voteList', JSON.stringify(draftData))
 
                             }
                         }
@@ -172,17 +195,16 @@
                 }
             },
             openDateTimer(e) {
-                console.log(e)
                 if (~~e === 3) {
                     this.$refs.picker.open();
-                }else if(~~e === 1){
+                } else if (~~e === 1) {
                     this.vote.endTime = this.calculationDate(1)
-                }else if(~~e === 2){
+                } else if (~~e === 2) {
                     this.vote.endTime = this.calculationDate(7)
                 }
                 console.log(this.vote.endTime)
             },
-            calculationDate(key){
+            calculationDate(key) {
                 var nowDate = new Date(Date.parse(new Date()) + (key * 24 * 3600 * 1000));
                 var y = nowDate.getFullYear();
                 var m = nowDate.getMonth() + 1;
@@ -191,10 +213,10 @@
                 var _m = nowDate.getMinutes();
                 var s = nowDate.getSeconds();
 
-                return y + '-' + m + '-' + d+'  '+h+':'+_m
+                return y + '-' + m + '-' + d + '  ' + h + ':' + _m + ':00'
             },
             dateFilter(e) {
-                this.vote.endTime = e.getFullYear() + '-' + (e.getMonth() + 1) + '-' + e.getDate()
+                this.vote.endTime = e.getFullYear() + '-' + (e.getMonth() + 1) + '-' + e.getDate() + '   00:00:00'
             },
 
             // 表单验证
@@ -210,11 +232,20 @@
                     return false;
                 }
 
-                if(vote.endTime.length === 0 && ~~vote.endTimeType === 3){
+                if (vote.endTime && vote.endTime.length === 0 && ~~vote.endTimeType === 3) {
                     Toast('请选择截止时间');
                     return false;
                 }
+                return true;
             }
+        },
+        beforeRouteEnter(to, from, next) {
+
+            next(vm => {
+                if (from.name === 'vote') {
+                    vm.vote = JSON.parse(localStorage.getItem('preview'))
+                }
+            })
         },
         components: {
             PublicHeader
@@ -238,7 +269,6 @@
         height 1.17rem
         width 100%
 
-
     .createVote-containerItem
         background #fff
         padding 0 .15rem .1rem
@@ -247,7 +277,7 @@
         padding 0 .15rem
         width 100%
         box-sizing border-box
-        background-color unset
+        background-color: rgba(0,0,0,0);
         height .52rem
         overflow hidden
         border-radius: 0.05rem 0.05rem 0 0;

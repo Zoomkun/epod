@@ -1,6 +1,8 @@
 <template>
     <div class="voteResults-main small-bg">
-        <PublicHeader :header-params="header"></PublicHeader>
+        <div class="voteResults-header">
+            <PublicHeader :header-params="header"></PublicHeader>
+        </div>
         <div class="voteResults-content">
             <div class="voteResults-info clear">
                 <div class="voteResults-topIcon" :class="{'active': info.isVote}"></div>
@@ -11,8 +13,14 @@
                 <div class="voteResults-done">投票状态：<span class="voteResults-voteState"
                                                          :class="{active:info.state == 1}">{{state[info.state-1]}}</span>
                 </div>
-                <div class="voteResults-link"><span>投票链接：</span><span class="voteResults-linkInfo">{{this.$route.fullPath}}</span><span
-                    class="voteResults-copy">复制</span></div>
+                <div class="voteResults-link">
+                    <span>投票链接：</span>
+                    <span class="voteResults-linkInfo">{{copyData}}</span>
+                    <span class="voteResults-copy"
+                          v-clipboard:copy="copyData"
+                          v-clipboard:success="copyCode"
+                    >复制</span>
+                </div>
             </div>
             <div class="voteResults-options">
                 <div class="voteResults-optionsTitle">投票统计</div>
@@ -23,10 +31,9 @@
 
                 <div v-for="item in info.optionDTOList ">
                     <p class="voteResults-optionsDesc">{{item.content}}&nbsp;&nbsp;{{item.amount}}<span
-                        class="voteResults-percentage">{{item.amount*100}}%</span></p>
+                        class="voteResults-percentage">{{item.percentage*100}}%</span></p>
                     <mt-progress :value="20" :bar-height="10"></mt-progress>
                 </div>
-
             </div>
         </div>
     </div>
@@ -34,11 +41,14 @@
 
 <script>
     import PublicHeader from '@/components/header.vue'
+    import {Toast} from 'mint-ui';
 
     export default {
         name: 'voteResults',
         mounted() {
             this.voteId = this.$route.query.voteId
+            this.copyData = window.location.href
+            console.log(window.location.href)
             this.getData()
         },
         data() {
@@ -49,6 +59,7 @@
 
                     }
                 },
+                copyData:'',
                 voteId: '',
                 state: ['进行中', '已结束', '编辑中'],
                 info: {}
@@ -78,6 +89,9 @@
                             console.log(self.header.tool)
                         }
                     })
+            },
+            copyCode () {
+                Toast('复制成功')
             }
         },
         components: {
@@ -92,12 +106,19 @@
         width 100%
         height 100%
         box-sizing border-box
+        display -webkit-box
+        display -ms-flexbox
+        display flex
+        -webkit-box-orient vertical
+        -ms-flex-direction column
+        flex-direction column
 
     .voteResults-content
         width 100%
+        flex 1
         box-sizing border-box
         padding .15rem
-        float left
+        overflow auto
 
     .voteResults-info, .voteResults-options
         width 100%
@@ -111,7 +132,12 @@
 
     .voteResults-options
         margin-top .1rem
+        overflow auto
         padding .15rem
+
+    .voteResults-header
+        height .65rem
+        width 100%
 
     .voteResults-staticIn
         height .24rem

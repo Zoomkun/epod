@@ -1,5 +1,5 @@
 <template>
-    <section class="transactionRecords-box" @scroll="timerFixed">
+    <section class="transactionRecords-box">
         <div class="transactionRecords-wrapper">
             <header class="transactionRecords-header">
                 <span class="transactionRecords-back" @click="() => {this.$router.go(-1)}"><<</span>
@@ -7,20 +7,18 @@
             </header>
             <h6 class="transactionRecords-title">查询时间</h6>
             <div class="transactionRecords-timerBox">
-                <div :class="{'transactionRecords-timerContent':client.fixed}">
-                    <div class="transactionRecords-timer">
+                <div class="transactionRecords-timer">
                     <span class="transactionRecords-timerBtn" v-for="(item,index) in time.timerTool"
                           @click="setTime(index,item)">{{item}}</span>
-                        <span class="transactionRecords-timerBtn">自定义</span>
-                    </div>
-                    <p class="transactionRecords-timerBoard">
-                        {{time.showTime}}
-                    </p>
+                    <span class="transactionRecords-timerBtn">自定义</span>
                 </div>
+                <p class="transactionRecords-timerBoard">
+                    {{time.showTime}}
+                </p>
             </div>
             <div>
-                <div class="transactionRecords-list" v-for="(item,index ) in records" @click="goToInfo">
-                    <p class=";">{{item.type === 1 ? '买入': '卖出',item.no}} <span class="transactionRecords-num">{{item.type === 1 ?  '+': '-'}}{{item.changeDelta}}{{item.no}}</span>
+                <div class="transactionRecords-list" v-for="(item,index ) in records" @click="goToInfo(item)">
+                    <p class=";">{{item.type === 1 ? '买入': '卖出',item.no}} <span class="transactionRecords-num">{{item.type === 1 ?  '+': '-'}}${{item.changeDelta}}</span>
                     </p>
                     <span class="transactionRecords-time">{{item.createTimestamp}}</span>
                 </div>
@@ -30,38 +28,15 @@
 </template>
 
 <script>
-    import BScroll from 'better-scroll'
-
     export default {
         name: 'transactionRecords',
         mounted() {
-            let self = this
-            let data = self.records[0]
-
-            for (let i = 0; i < 10; i++) {
-                self.records.push(data)
-            }
-
-            let timerBox = document.getElementsByClassName('transactionRecords-timerBox')[0]
-            let client = timerBox.getBoundingClientRect()
-            self.client.clientTop = client.y - 20;
-
-            document.getElementsByClassName('main')[0].addEventListener('scroll', self.timerFixed)
-
-            let wrapper = document.querySelector('.transactionRecords-box')
-            self.scroll = new BScroll(wrapper, {
-                click: true, probeType: 2,})
-            self.scroll.on('scroll', (pos) => {
-            })
-        }
-        ,
-        destroyed() {
-            document.getElementsByClassName('main')[0].removeEventListener('scroll', self.timerFixed)
+            this.formData.assetCode = this.$route.query.code
+            this.getData(this.formData)
         }
         ,
         data() {
             return {
-                scroll: null,
                 time: {
                     postTime: "",
                     showTime: "默认",
@@ -75,52 +50,60 @@
                         "createTimestamp": '2018-10-11 12:00:00' //变动时间 毫秒数
                     }
                 ],
-                client: {
-                    clientTop: 0,
-                    fixed: false,
+                formData: {
+                    assetCode: "",
+                    startTime: "",
+                    endTime: "",
+                    pageNo: 1,
+                    pageSize: 20
                 }
             }
         }
         ,
         methods: {
-            timerFixed(event) {
-                let self = this
-                let target = event.target
-                if (target.scrollTop > self.client.clientTop) {
-                    self.client.fixed = true
-                } else {
-                    self.client.fixed = false
-                }
-            }
-            ,
-            goToInfo() {
-                this.$router.push('/mine/transactionDetail')
+            goToInfo(data) {
+                this.$router.push({path:'/mine/transactionDetail',query:data})
             }
             ,
             setTime(index, item) {
+                //todo:时间优化
                 let self = this
                 self.time.showTime = item;
                 switch (index) {
                     case 0:
-                        self.time.postTime = '';
+                        self.formData.startTime= '';
+                        self.formData.endTime= '';
                         break;
                     case 1:
-                        self.time.postTime = self.weekAgo();
+                        self.formData.startTime= self.dayAgo(7);
+                        self.formData.endTime= self.dayAgo(0);
                         break;
                     case 2:
-                        ;
-                        self.time.postTime = self.monthAgo();
+                        self.formData.startTime= self.monthAgo();
+                        self.formData.endTime= self.dayAgo(0);
                         break;
                     case 3:
-                        self.time.postTime = self.yearAgo();
+                        self.formData.startTime= self.yearAgo();
+                        self.formData.endTime= self.dayAgo(0);
                         break;
                 }
+                this.getData(self.formData)
+            },
+            // 获取列表数据
+            getData(key) {
+                let self = this
+                self.$ajax.post('easset/asset/transaction/list', key)
+                    .then(function (data) {
+                        if (data.code === 1) {
+                            self.records = data.data.result
+                        }
+                    })
             }
             ,
             // 一周内
-            weekAgo() {
+            dayAgo(key) {
                 var nowDate = new Date();
-                var oneWeekDate = new Date(nowDate - 7 * 24 * 3600 * 1000);
+                var oneWeekDate = new Date(nowDate - key * 24 * 3600 * 1000);
                 var y = oneWeekDate.getFullYear();
                 var M = oneWeekDate.getMonth() + 1;
                 var d = oneWeekDate.getDate();
@@ -190,13 +173,6 @@
         .transactionRecords-title
             font-size .2rem
             padding 0 .2rem
-
-        .transactionRecords-timerContent
-            position fixed
-            width 100%
-            height 1rem
-            background #fff
-            top 0
 
         .transactionRecords-timerBox
             height 1rem
